@@ -1,4 +1,4 @@
-﻿
+
 
 
 state("WinKawaks")
@@ -185,21 +185,21 @@ init
 
 
 	//The background at the start of mission 1, mingled with the fade in
-	//Starts at pixel ( 2 , 55 )
+	//Starts at pixel ( 0 , 179 )
 	vars.colorsRunStart = new byte[]		{
-												48, 88, 64, 0,
+												64, 128, 192, 0,
 												0, 0, 0, 0,
-												48, 112, 112, 0,
+												64, 128, 192, 0,
 												0, 0, 0, 0,
-												56, 104, 80, 0,
+												64, 128, 192, 0,
 												0, 0, 0, 0,
-												16, 40, 32, 0,
+												64, 128, 192, 0,
 												0, 0, 0, 0,
-												48, 88, 64, 0,
+												64, 128, 192, 0,
 												0, 0, 0, 0
 											};
 		
-	vars.offsetRunStart = 0x10548;
+	vars.offsetRunStart = 0x35240;
 	
 	
 	
@@ -299,9 +299,9 @@ update
 		/*
 		if (vars.localTickCount % 10 == 0)
 		{
-			print("[MS5 AutoSplitter] " + vars.splitCounter.ToString() + " - " + "BossStart");
+			print("[MS5 AutoSplitter] " + vars.splitCounter.ToString());
 			
-			vars.PrintArray(vars.ReadArray(game, vars.offsetBossStart));
+			vars.PrintArray(vars.ReadArray(game, vars.offsetRunStart));
 		}
 		*/
 
