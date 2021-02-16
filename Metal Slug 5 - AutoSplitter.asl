@@ -6,6 +6,11 @@ state("WinKawaks")
 	int pointerScreen : 0x0046B270;
 }
 
+state("fcadefbneo")
+{
+	int pointerScreen : 0x02CC2280, 0x4, 0x4, 0x14;
+}
+
 
 
 
@@ -18,9 +23,7 @@ startup
 	{
 
 		IntPtr pointer = IntPtr.Zero;
-
-
-
+		
 		foreach (var page in process.MemoryPages())
 		{
 
@@ -31,9 +34,7 @@ startup
 			if (pointer != IntPtr.Zero) break;
 
 		}
-
-
-
+		
 		return pointer;
 
 	};
@@ -42,13 +43,13 @@ startup
 
 
 
-	//A function that reads an array of 40 bytes in the screen memory
+	//A function that reads an array of 60 bytes in the screen memory
 	Func<Process, int, byte[]> ReadArray = (process, offset) =>
 	{
 
-		byte[] bytes = new byte[40];
+		byte[] bytes = new byte[60];
 
-		bool succes = ExtensionMethods.ReadBytes(process, vars.pointerScreen + offset, 40, out bytes);
+		bool succes = ExtensionMethods.ReadBytes(process, vars.pointerScreen + offset, 60, out bytes);
 
 		if (!succes)
 		{
@@ -72,7 +73,7 @@ startup
 			return false;
 		}
 
-		for (int i = 0; i < bytes.Length; i++)
+		for (int i = 0; i < bytes.Length && i < colors.Length; i++)
 		{
 
 			if (bytes[i] != colors[i])
@@ -181,83 +182,185 @@ init
 	 * On the WinKawaks version, the offset is X * 0x4 + Y * 0x500
 	 * 
 	 */
+	if(game.ProcessName.Equals("WinKawaks"))
+	{
+
+		//The background at the start of mission 1, mingled with the fade in
+		//Starts at pixel ( 0 , 179 )
+		vars.colorsRunStart = new byte[]		{
+													64,  128, 192, 0,
+													0,   0,   0,   0,
+													64,  128, 192, 0,
+													0,   0,   0,   0,
+													64,  128, 192, 0,
+													0,   0,   0,   0,
+													64,  128, 192, 0,
+													0,   0,   0,   0,
+													64,  128, 192, 0,
+													0,   0,   0,   0
+												};
+		
+		vars.offsetRunStart = 0x35240;
 	
+	
+	
+		//The exclamation mark in the Mission Complete !" text
+		//Starts at pixel ( 247 , 113 )
+		vars.colorsExclamationMark = new byte[] {
+													0,   0,   0,   0,
+													248, 248, 248, 0,
+													0,   0,   120, 0,
+													48,  208, 248, 0,
+													24,  144, 248, 0,
+													48,  208, 248, 0,
+													24,  144, 248, 0,
+													48,  208, 248, 0,
+													248, 248, 248, 0,
+													0,   0,   0,   0
+												};
+
+		vars.offsetExclamationMark = 0x21C9C;
+	
+	
+	
+		//The grey of the UI
+		//Starts at pixel ( 80 , 8 )
+		vars.colorsUI = new byte[]				{
+													184, 168, 160, 0,
+													184, 168, 160, 0,
+													184, 168, 160, 0,
+													184, 168, 160, 0,
+													184, 168, 160, 0,
+													184, 168, 160, 0,
+													184, 168, 160, 0,
+													184, 168, 160, 0,
+													184, 168, 160, 0,
+													184, 168, 160, 0
+												};
+
+		vars.offsetUI = 0x2740;
+		
+		
+		
+		//The bricks in the foreground, during the last phase
+		//Starts at pixel ( 34 , 205 )
+		vars.colorsBossStart = new byte[]		{
+													72,  88,  112, 0,
+													72,  88,  112, 0,
+													88,  112, 120, 0,
+													104, 128, 144, 0,
+													152, 176, 184, 0,
+													88,  112, 120, 0,
+													48,  72,  96,  0,
+													72,  88,  112, 0,
+													72,  88,  112, 0,
+													72,  88,  112, 0
+												};
+		
+		vars.offsetBossStart = 0x3CE48;
+	
+	}
 
 
-	//The background at the start of mission 1, mingled with the fade in
-	//Starts at pixel ( 0 , 179 )
-	vars.colorsRunStart = new byte[]		{
-												64,  128, 192, 0,
-												0,   0,   0,   0,
-												64,  128, 192, 0,
-												0,   0,   0,   0,
-												64,  128, 192, 0,
-												0,   0,   0,   0,
-												64,  128, 192, 0,
-												0,   0,   0,   0,
-												64,  128, 192, 0,
-												0,   0,   0,   0
-											};
-		
-	vars.offsetRunStart = 0x35240;
-	
-	
-	
-	//The exclamation mark in the Mission Complete !" text
-	//Starts at pixel ( 247 , 113 )
-	vars.colorsExclamationMark = new byte[] {
-												0,   0,   0,   0,
-												248, 248, 248, 0,
-												0,   0,   120, 0,
-												48,  208, 248, 0,
-												24,  144, 248, 0,
-												48,  208, 248, 0,
-												24,  144, 248, 0,
-												48,  208, 248, 0,
-												248, 248, 248, 0,
-												0,   0,   0,   0
-											};
 
-	vars.offsetExclamationMark = 0x21C9C;
-	
-	
-	
-	//The grey of the UI
-	//Starts at pixel ( 80 , 8 )
-	vars.colorsUI = new byte[]				{
-												184, 168, 160, 0,
-												184, 168, 160, 0,
-												184, 168, 160, 0,
-												184, 168, 160, 0,
-												184, 168, 160, 0,
-												184, 168, 160, 0,
-												184, 168, 160, 0,
-												184, 168, 160, 0,
-												184, 168, 160, 0,
-												184, 168, 160, 0
-											};
+	else //if (game.ProcessName.Equals("fcadefbneo"))
+	{
 
-	vars.offsetUI = 0x2740;
+		//The background at the start of mission 1, mingled with the fade in
+		//Starts at pixel ( 0 , 179 )
+		vars.colorsRunStart = new byte[]		{
+													66,  132, 198, 0,
+													66,  132, 198, 0,
+													0,   0,   0,   0,
+													0,   0,   0,   0,
+													66,  132, 198, 0,
+													66,  132, 198, 0,
+													0,   0,   0,   0,
+													0,   0,   0,   0,
+													66,  132, 198, 0,
+													66,  132, 198, 0,
+													0,   0,   0,   0,
+													0,   0,   0,   0,
+													66,  132, 198, 0,
+													66,  132, 198, 0,
+													0,   0,   0,   0
+												};
 		
-		
-		
-	//The bricks in the foreground, during the last phase
-	//Starts at pixel ( 34 , 205 )
-	vars.colorsBossStart = new byte[]		{
-												72,  88,  112, 0,
-												72,  88,  112, 0,
-												88,  112, 120, 0,
-												104, 128, 144, 0,
-												152, 176, 184, 0,
-												88,  112, 120, 0,
-												48,  72,  96,  0,
-												72,  88,  112, 0,
-												72,  88,  112, 0,
-												72,  88,  112, 0
-											};
-		
-	vars.offsetBossStart = 0x3CE48;
+		vars.offsetRunStart = 0xD4900;
 	
+	
+	
+		//The exclamation mark in the Mission Complete !" text
+		//Starts at pixel ( 247 , 113 )
+		vars.colorsExclamationMark = new byte[] {
+													0,   0,   0,   0,
+													0,   0,   0,   0,
+													255, 255, 255, 0,
+													255, 255, 255, 0,
+													0,   0,   123, 0,
+													0,   0,   123, 0,
+													49,  214, 255, 0,
+													49,  214, 255, 0,
+													24,  148, 255, 0,
+													24,  148, 255, 0,
+													49,  214, 255, 0,
+													49,  214, 255, 0,
+													24,  148, 255, 0,
+													24,  148, 255, 0,
+													49,  214, 255, 0
+												};
+
+		vars.offsetExclamationMark = 0x86AB8;
+	
+	
+	
+		//The grey of the UI
+		//Starts at pixel ( 80 , 8 )
+		vars.colorsUI = new byte[]				{
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0,
+													189, 173, 165, 0
+												};
+
+		vars.offsetUI = 0x9A80;
+		
+		
+		
+		//The bricks in the foreground, during the last phase
+		//Starts at pixel ( 34 , 205 )
+		vars.colorsBossStart = new byte[]		{
+													74,  90,  115, 0,
+													74,  90,  115, 0,
+													74,  90,  115, 0,
+													74,  90,  115, 0,
+													90,  115, 123, 0,
+													90,  115, 123, 0,
+													107, 132, 148, 0,
+													107, 132, 148, 0,
+													156, 181, 189, 0,
+													156, 181, 189, 0,
+													90,  115, 123, 0,
+													90,  115, 123, 0,
+													49,  74,  99,  0,
+													49,  74,  99,  0,
+													74,  90,  115, 0
+												};
+		
+		vars.offsetBossStart = 0xF3810;
+	
+	}
 }
 
 
@@ -295,11 +398,11 @@ update
 	if (vars.pointerScreen != IntPtr.Zero)
 	{
 		
-		//Debug print
 		/*
+		//Debug print
 		if (vars.localTickCount % 10 == 0)
 		{
-			print("[MS5 AutoSplitter] " + vars.splitCounter.ToString());
+			print("[MS5 AutoSplitter] Debug " + vars.splitCounter.ToString());
 			
 			vars.PrintArray(vars.ReadArray(game, vars.offsetRunStart));
 		}
