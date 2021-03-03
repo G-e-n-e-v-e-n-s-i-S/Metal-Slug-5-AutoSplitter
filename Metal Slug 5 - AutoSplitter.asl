@@ -125,7 +125,12 @@ startup
 	//Should we reset and restart the timer
 	vars.restart = false;
 
+
 	
+	//The time at which the last reset happenend
+	vars.prevRestartTime = Environment.TickCount;
+
+
 
 	//An array of bytes to find the boss's health variable
 	vars.scannerTargetBossHealth = new SigScanTarget(22, "10 00 8E D3 ?? 00 ?? ?? ?? ?? ?? ?? ?? 00 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 05 00 CC 21");
@@ -410,9 +415,19 @@ update
 
 		
 	
-		//Check if we should start/restart the timer
-		vars.restart = vars.MatchArray(vars.ReadArray(game, vars.offsetRunStart), vars.colorsRunStart);
+		//Check time since last reset, don't reset if we already reset in the last second
+		var timeSinceLastReset = Environment.TickCount - vars.prevRestartTime;
 		
+		if (timeSinceLastReset< 1000)
+		{
+			vars.restart = false;
+		}
+	
+		//Otherwise, check if we should start/restart the timer
+		else
+		{
+			vars.restart = vars.MatchArray(vars.ReadArray(game, vars.offsetRunStart), vars.colorsRunStart);
+		}
 	}
 }
 
@@ -427,6 +442,8 @@ reset
 	{
 		vars.splitCounter = 0;
 		
+		vars.prevRestartTime = Environment.TickCount;
+
 		vars.prevSplitTime = -1;
 		
 		vars.prevScanTimeBossHealth = -1;
@@ -450,6 +467,8 @@ start
 	{
 		vars.splitCounter = 0;
 		
+		vars.prevRestartTime = Environment.TickCount;
+
 		vars.prevSplitTime = -1;
 		
 		vars.prevScanTimeBossHealth = -1;
